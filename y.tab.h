@@ -1,0 +1,13 @@
+#define BEGINING    1
+#define BODY        2
+#define END         3
+#define SIZE        4
+#define IDENTIFIER  5
+#define MOVE        6
+#define TO          7
+#define ADD         8
+#define INPUT       9
+#define PRINT       10
+#define TEXT        11
+#define INTEGER     12
+#define SEMICOLON   13
