@@ -9,6 +9,4 @@ INPUT Y.
 
 MOVE 15 TO Z.
 ADD Y TO Z.
-PRINT X;" + ";Y;"="Z.
-
-END.
+PRINT XY;" + ";Y;"=";Z.
