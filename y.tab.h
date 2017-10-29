@@ -11,3 +11,4 @@
 #define TEXT        11
 #define INTEGER     12
 #define SEMICOLON   13
+#define TERMINATOR  14

@@ -7,7 +7,7 @@ void printToken(int, char*);
 %}
 
 %%
-[\t\n ]+              /* Ignore whitespace */ ;
+[\t\n ]+            /* Ignore whitespace */ ;
 (?i:BEGINING)       { printToken(BEGINING, "BEGINING"); }
 (?i:BODY)           { printToken(BODY, "BODY"); }
 (?i:END)            { printToken(END, "END"); }
@@ -21,6 +21,7 @@ void printToken(int, char*);
 [0-9]+              { printToken(INTEGER, "INTEGER"); }
 [A-Za-z0-9\-]+      { printToken(IDENTIFIER, "IDENTIFIER"); }
 \".*\"              { printToken(TEXT, "TEXT"); }
+\.                  { printToken(TERMINATOR, "TERMINATOR"); printf("\n"); }
 .                   { return(0); }
 %%
 
