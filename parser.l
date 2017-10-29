@@ -20,7 +20,7 @@ void printToken(int, char*);
 ;                           { printToken(SEMICOLON, "SEMICOLON"); }
 [0-9]+                      { printToken(INTEGER, "INTEGER"); }
 [A-Za-z][A-Za-z0-9\-]*      { printToken(IDENTIFIER, "IDENTIFIER"); }
-\".*\"                      { printToken(TEXT, "TEXT"); }
+\"(\\.|[^"\\])*\"           { printToken(TEXT, "TEXT"); }
 \.                          { printToken(TERMINATOR, "TERMINATOR"); printf("\n"); }
 .                           { return(0); }
 %%
