@@ -11,7 +11,7 @@ void printToken(int, char*);
 (?i:BEGINING)       { printToken(BEGINING, "BEGINING"); }
 (?i:BODY)           { printToken(BODY, "BODY"); }
 (?i:END)            { printToken(END, "END"); }
-[Xx]+               { printToken(SIZE, "SIZE"); }
+^[Xx]+              { printToken(SIZE, "SIZE"); }
 (?i:MOVE)           { printToken(MOVE, "MOVE"); }
 (?i:TO)             { printToken(TO, "TO"); }
 (?i:ADD)            { printToken(ADD, "ADD"); }
