@@ -1,7 +1,7 @@
 #define BEGINING    1
 #define BODY        2
 #define END         3
-#define SIZE        4
+#define NUMSIZE     4
 #define IDENTIFIER  5
 #define MOVE        6
 #define TO          7
