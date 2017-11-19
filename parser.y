@@ -3,20 +3,38 @@
 * Written by Patrick Joseph Cribbin - 14137208
 */
 #include<stdio.h>
-int yylex();
+
+extern int yylex();
+extern int yyparse();
 void yyerror(const char *s);
-%}
-%token BEGINING BODY END NUMSIZE IDENTIFIER MOVE TO ADD INPUT PRINT TEXT INTEGER SEMICOLON TERMINATOR
-
-%%
-sentence: NUMSIZE IDENTIFIER TERMINATOR
-        { printf("Is a valid sentence!"); }
-%%
-
 extern FILE *yyin;
+
+%}
+%start start
+%token BEGINING
+%token BODY
+%token END
+%token NUMSIZE
+%token IDENTIFIER
+%token MOVE
+%token TO
+%token ADD
+%token INPUT
+%token PRINT
+%token TEXT
+%token INTEGER
+%token SEMICOLON
+%token TERMINATOR
+%token INVALID
+
+%%
+start: BEGINING TERMINATOR { printf("Start\n"); }
+%%
+
 int main() {
-    do yyparse();
-    while(!feof(yyin));
+    do {
+        yyparse();
+    } while(!feof(yyin));
 }
 
 void yyerror(const char *s) {
