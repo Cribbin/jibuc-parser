@@ -81,6 +81,5 @@ int getVarSize(char *var) {
 void addVar(int size, char *name) {
     strcpy(identifiers[varCounter], name);
     sizes[varCounter] = size;
-    printf("Name: %s | Size: %d\n", identifiers[varCounter], sizes[varCounter]);
     varCounter++;
 }
