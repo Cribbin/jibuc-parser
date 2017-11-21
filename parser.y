@@ -23,8 +23,10 @@ void addVar(int size, char *name);
 void moveIntToVar(int num, char *var);
 void moveIdToVar(char *var1, char *var2);
 void removeEnding(char *var);
+void checkVar(char *var);
 int isVar(char *var);
 void getFirstVar(char *var);
+int varExists(char *name);
 
 %}
 %union {char *id; int size;}
@@ -45,15 +47,16 @@ code:           line code {}
 line:           print | input | move | add {}
 print:          PRINT printStmt {}
 printStmt:      TEXT SEMICOLON printStmt {}
-                | IDENTIFIER SEMICOLON printStmt {}
+                | IDENTIFIER SEMICOLON printStmt { checkVar($1); }
                 | TEXT TERMINATOR {}
-                | IDENTIFIER TERMINATOR {}
+                | IDENTIFIER TERMINATOR { checkVar($1); }
 input:          INPUT inputStmt {}
-inputStmt:      IDENTIFIER TERMINATOR { isVar($1); }
-                | IDENTIFIER SEMICOLON inputStmt { isVar($1); }
+inputStmt:      IDENTIFIER TERMINATOR { checkVar($1); }
+                | IDENTIFIER SEMICOLON inputStmt { checkVar($1); }
 move:           MOVE INTEGER TO IDENTIFIER TERMINATOR { moveIntToVar($2, $4); }
                 | MOVE IDENTIFIER TO IDENTIFIER TERMINATOR { moveIdToVar($2, $4); }
-add:            ADD IDENTIFIER TO IDENTIFIER TERMINATOR {}
+add:            ADD IDENTIFIER TO IDENTIFIER TERMINATOR { moveIdToVar($2, $4); }
+                | ADD INTEGER TO IDENTIFIER TERMINATOR { moveIntToVar($2, $4); }
 end:            END TERMINATOR { exit(EXIT_SUCCESS); }
 %%
 
@@ -83,7 +86,6 @@ void moveIntToVar(int num, char *var) {
 }
 
 int isVar(char *var) {
-    removeEnding(var);
     if (strstr(var, ";") != NULL) {
         getFirstVar(var);
     }
@@ -92,18 +94,26 @@ int isVar(char *var) {
             return 1;
         }
     }
-    printf("Warning (L%d): Identifier %s not initialised.\n", lineNo, var);
     return 0;
 }
 
 void moveIdToVar(char *var1, char *var2) {
-    int size1 = getVarSize(var1);
-    int size2 = getVarSize(var2);
+    getFirstVar(var1);
+    removeEnding(var2);
 
-    printf("Size 1: %d | Size 2: %d\n", size1, size2);
+    if (isVar(var1)) {
+            if (isVar(var2)) {
+            int size1 = getVarSize(var1);
+            int size2 = getVarSize(var2);
 
-    if (size1 > size2) {
-        printf("Warning (L%d): Moving %s (%d digits) to %s (%d digits).\n", lineNo, var1, size1, var2, size2);
+            if (size1 > size2) {
+                printf("Warning (L%d): Moving %s (%d digits) to %s (%d digits).\n", lineNo, var1, size1, var2, size2);
+            }
+        } else {
+            printf("Warning (L%d): Identifier %s not initialised.\n", lineNo, var2);
+        }
+    } else {
+        printf("Warning (L%d): Identifier %s not initialised.\n", lineNo, var1);
     }
 }
 
@@ -118,9 +128,13 @@ int getVarSize(char *var) {
 
 void addVar(int size, char *name) {
     removeEnding(name);
-    strcpy(identifiers[varCounter], name);
-    sizes[varCounter] = size;
-    varCounter++;
+    if (!isVar(name)) {
+        strcpy(identifiers[varCounter], name);
+        sizes[varCounter] = size;
+        varCounter++;
+    } else {
+        printf("Warning (L%d): Identifier %s already initialised.\n", lineNo, name);
+    }
 }
 
 void removeEnding(char *var) {
@@ -131,9 +145,16 @@ void removeEnding(char *var) {
 
 void getFirstVar(char *var) {
     for (int i = 0; i < strlen(var); i++) {
-        if (var[i] == ';') {
+        if (var[i] == ';' || var[i] == ' ') {
             var[i] = '\0';
             break;
         }
+    }
+}
+
+void checkVar(char *var) {
+    removeEnding(var);
+    if (!isVar(var)) {
+        printf("Warning (L%d): Identifier %s not initialised.\n", lineNo, var);
     }
 }
