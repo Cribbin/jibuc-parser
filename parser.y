@@ -22,7 +22,7 @@ int getVarSize(char *var);
 void addVar(int size, char *name);
 void moveIntToVar(int num, char *var);
 void moveIdToVar(char *var1, char *var2);
-void removeEnding(char *var);
+void trimEnding(char *var);
 void checkVar(char *var);
 int isVar(char *var);
 void getFirstVar(char *var);
@@ -55,8 +55,8 @@ inputStmt:      IDENTIFIER TERMINATOR { checkVar($1); }
                 | IDENTIFIER SEMICOLON inputStmt { checkVar($1); }
 move:           MOVE INTEGER TO IDENTIFIER TERMINATOR { moveIntToVar($2, $4); }
                 | MOVE IDENTIFIER TO IDENTIFIER TERMINATOR { moveIdToVar($2, $4); }
-add:            ADD IDENTIFIER TO IDENTIFIER TERMINATOR { moveIdToVar($2, $4); }
-                | ADD INTEGER TO IDENTIFIER TERMINATOR { moveIntToVar($2, $4); }
+add:            ADD INTEGER TO IDENTIFIER TERMINATOR { moveIntToVar($2, $4); }
+                | ADD IDENTIFIER TO IDENTIFIER TERMINATOR { moveIdToVar($2, $4); }
 end:            END TERMINATOR { exit(EXIT_SUCCESS); }
 %%
 
@@ -70,18 +70,20 @@ void yyerror(const char *s) {
     fprintf(stderr, "Error (L%d): %s\n", yylineno, s);
 }
 
-void moveIntToVar(int num, char *var) {
-    removeEnding(var);
-    int size = getVarSize(var);
-
-    if (size > -1) {
-        int inputDigits = floor(log10(abs(num))) + 1;
-
-        if (inputDigits > size) {
-            printf("Warning (L%d): Integer is too large. Expected %d digits or less, is %d.\n", yylineno, size, inputDigits);
-        }
+void addVar(int size, char *name) {
+    trimEnding(name);
+    if (!isVar(name)) {
+        strcpy(identifiers[varCounter], name);
+        sizes[varCounter] = size;
+        varCounter++;
     } else {
-        printf("Warning (L%d): Integer cannot be assigned. Identifier %s not initialised.\n", yylineno, var);
+        printf("Warning (L%d): Identifier %s already initialised.\n", yylineno, name);
+    }
+}
+
+void trimEnding(char *var) {
+    if (var[strlen(var)-1] == '.') {
+        var[strlen(var)-1] = 0;
     }
 }
 
@@ -97,9 +99,49 @@ int isVar(char *var) {
     return 0;
 }
 
+void getFirstVar(char *var) {
+    for (int i = 0; i < strlen(var); i++) {
+        if (var[i] == ';' || var[i] == ' ') {
+            var[i] = '\0';
+            break;
+        }
+    }
+}
+
+void checkVar(char *var) {
+    trimEnding(var);
+    if (!isVar(var)) {
+        printf("Warning (L%d): Identifier %s not initialised.\n", yylineno, var);
+    }
+}
+
+void moveIntToVar(int num, char *var) {
+    trimEnding(var);
+    int size = getVarSize(var);
+
+    if (size > -1) {
+        int inputDigits = floor(log10(abs(num))) + 1;
+
+        if (inputDigits > size) {
+            printf("Warning (L%d): Integer is too large. Expected %d digits or less, is %d.\n", yylineno, size, inputDigits);
+        }
+    } else {
+        printf("Warning (L%d): Integer cannot be assigned. Identifier %s not initialised.\n", yylineno, var);
+    }
+}
+
+int getVarSize(char *var) {
+    for (int i = 0; i < varCounter; i++) {
+        if (strcmp(var, identifiers[i]) == 0) {
+            return sizes[i];
+        }
+    }
+    return -1;
+}
+
 void moveIdToVar(char *var1, char *var2) {
     getFirstVar(var1);
-    removeEnding(var2);
+    trimEnding(var2);
 
     if (isVar(var1)) {
             if (isVar(var2)) {
@@ -114,47 +156,5 @@ void moveIdToVar(char *var1, char *var2) {
         }
     } else {
         printf("Warning (L%d): Identifier %s not initialised.\n", yylineno, var1);
-    }
-}
-
-int getVarSize(char *var) {
-    for (int i = 0; i < varCounter; i++) {
-        if (strcmp(var, identifiers[i]) == 0) {
-            return sizes[i];
-        }
-    }
-    return -1;
-}
-
-void addVar(int size, char *name) {
-    removeEnding(name);
-    if (!isVar(name)) {
-        strcpy(identifiers[varCounter], name);
-        sizes[varCounter] = size;
-        varCounter++;
-    } else {
-        printf("Warning (L%d): Identifier %s already initialised.\n", yylineno, name);
-    }
-}
-
-void removeEnding(char *var) {
-    if (var[strlen(var)-1] == '.') {
-        var[strlen(var)-1] = 0;
-    }
-}
-
-void getFirstVar(char *var) {
-    for (int i = 0; i < strlen(var); i++) {
-        if (var[i] == ';' || var[i] == ' ') {
-            var[i] = '\0';
-            break;
-        }
-    }
-}
-
-void checkVar(char *var) {
-    removeEnding(var);
-    if (!isVar(var)) {
-        printf("Warning (L%d): Identifier %s not initialised.\n", yylineno, var);
     }
 }
