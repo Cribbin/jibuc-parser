@@ -4,10 +4,12 @@
 */
 #include "y.tab.h"
 int getSize(char *x);
+int lineNo = 1;
 %}
 
 %%
-[\t\n ]+                    /* Ignore whitespace */ ;
+[\n]                        { lineNo++; }
+[\t ]+                      /* Ignore whitespace */ ;
 (?i:BEGINING)               { return BEGINING; }
 (?i:BODY)                   { return BODY; }
 (?i:END)                    { return END; }
