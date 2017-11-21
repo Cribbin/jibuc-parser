@@ -12,7 +12,7 @@ extern int yylex();
 extern int yyparse();
 void yyerror(const char *s);
 extern FILE *yyin;
-extern int lineNo;
+extern int yylineno;
 
 char identifiers[NUM_VARIABLES][32];
 int sizes[NUM_VARIABLES];
@@ -67,7 +67,7 @@ int main() {
 }
 
 void yyerror(const char *s) {
-    fprintf(stderr, "Error (L%d): %s\n", lineNo, s);
+    fprintf(stderr, "Error (L%d): %s\n", yylineno, s);
 }
 
 void moveIntToVar(int num, char *var) {
@@ -78,10 +78,10 @@ void moveIntToVar(int num, char *var) {
         int inputDigits = floor(log10(abs(num))) + 1;
 
         if (inputDigits > size) {
-            printf("Warning (L%d): Integer is too large. Expected %d digits or less, is %d.\n", lineNo, size, inputDigits);
+            printf("Warning (L%d): Integer is too large. Expected %d digits or less, is %d.\n", yylineno, size, inputDigits);
         }
     } else {
-        printf("Warning (L%d): Integer cannot be assigned. Identifier %s not initialised.\n", lineNo, var);
+        printf("Warning (L%d): Integer cannot be assigned. Identifier %s not initialised.\n", yylineno, var);
     }
 }
 
@@ -107,13 +107,13 @@ void moveIdToVar(char *var1, char *var2) {
             int size2 = getVarSize(var2);
 
             if (size1 > size2) {
-                printf("Warning (L%d): Moving %s (%d digits) to %s (%d digits).\n", lineNo, var1, size1, var2, size2);
+                printf("Warning (L%d): Moving %s (%d digits) to %s (%d digits).\n", yylineno, var1, size1, var2, size2);
             }
         } else {
-            printf("Warning (L%d): Identifier %s not initialised.\n", lineNo, var2);
+            printf("Warning (L%d): Identifier %s not initialised.\n", yylineno, var2);
         }
     } else {
-        printf("Warning (L%d): Identifier %s not initialised.\n", lineNo, var1);
+        printf("Warning (L%d): Identifier %s not initialised.\n", yylineno, var1);
     }
 }
 
@@ -133,7 +133,7 @@ void addVar(int size, char *name) {
         sizes[varCounter] = size;
         varCounter++;
     } else {
-        printf("Warning (L%d): Identifier %s already initialised.\n", lineNo, name);
+        printf("Warning (L%d): Identifier %s already initialised.\n", yylineno, name);
     }
 }
 
@@ -155,6 +155,6 @@ void getFirstVar(char *var) {
 void checkVar(char *var) {
     removeEnding(var);
     if (!isVar(var)) {
-        printf("Warning (L%d): Identifier %s not initialised.\n", lineNo, var);
+        printf("Warning (L%d): Identifier %s not initialised.\n", yylineno, var);
     }
 }
